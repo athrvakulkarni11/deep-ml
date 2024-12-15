@@ -1,6 +1,6 @@
 import numpy as np 
 
-def covariance_matrix(data):
+def covariance_matrix(data: np.ndarray) -> np.ndarray:
     counter = 0
     x_mean = 0
     y_mean = 0
@@ -10,8 +10,6 @@ def covariance_matrix(data):
         counter += 1
     x_mean = x_mean / counter
     y_mean = y_mean / counter
-    print(x_mean)
-    print(y_mean)
 
     variance_x = 0
     variance_y = 0
@@ -27,18 +25,23 @@ def covariance_matrix(data):
     covariance_xy = covariance_xy / (counter - 1)
 
     covariance_matrix = [[variance_x, covariance_xy], [covariance_xy, variance_y]]
-    return covariance_matrix
+    return np.array(covariance_matrix)
 
+def eigen_values_and_vectors(covariance_matrix: np.ndarray):
+    eigenval, eigenvec = np.linalg.eig(covariance_matrix)
+    return eigenval, eigenvec
 
+def pca(data: np.ndarray, k: int) -> list[list[float]]:
+    data_standardized = (data - np.mean(data, axis=0)) / np.std(data, axis=0)
+
+    cov = np.cov(data_standardized, rowvar=False)
     
-# def pca(data: np.ndarray, k: int) -> list[list[int|float]]:
-# 	# Your code here
-	
-# 	return principal_components
-data = np.array([[80, 70], [63, 20], [100, 50]])
-eigenval , eigenvector = np.linalg.eig(covariance_matrix(data))
-print(f"here is the eigenvalues :{eigenval}")
+    eigenvalues, eigenvectors = np.linalg.eig(cov)
+    
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvectors_sorted = eigenvectors[:, idx]
+    
+    principal_components = eigenvectors_sorted[:, :k]
+    
+    return np.round(principal_components, 4).tolist()
 
-k = 1
-
-covariance_matrix(data)
